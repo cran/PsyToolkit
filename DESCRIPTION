@@ -1,0 +1,17 @@
+Package: PsyToolkit
+Version: 1.1.0
+Title: Analysis Tools for 'PsyToolkit'
+Description: Analyses and reports 'PsyToolkit' questionnaire and experiment data. See Stoet (2017) <doi:10.1177/0098628316677643>.
+Authors@R: c( person( "Gijsbert","Stoet",email="g.stoet@essex.ac.uk",role=c("cre","aut"),comment=c(ORCID="0000-0002-7557-483X") ) )
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: openxlsx2
+NeedsCompilation: no
+Packaged: 2026-02-16 13:24:26 UTC; stoet
+Author: Gijsbert Stoet [cre, aut] (ORCID:
+    <https://orcid.org/0000-0002-7557-483X>)
+Maintainer: Gijsbert Stoet <g.stoet@essex.ac.uk>
+Depends: R (>= 3.5.0)
+Repository: CRAN
+Date/Publication: 2026-02-19 20:10:02 UTC
