@@ -20,22 +20,27 @@ formatTime = function( ms ){
   }
 }
 
-## options
-## textbox: show textbox reports (unless empty), also reports how many empty
-## question (T/F): show the original question text
+## psytkSurveyData: the output of psytkReadData()
+## textbox: include PsyToolkit textbox output or not in the report (can be quite long)
 
-psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
+psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE , print = TRUE ){
+
+    lines = character() # stores the text object
+
+    add = function(...) { # paste0 to avoid separators; one call = one line
+        lines <<- c(lines, paste0(...))
+    }
 
     psytkSurvey = psytkSurveyData$surveyobject$overview
     psytkItems = psytkSurveyData$surveyobject$psytkItems
 
     if ( !is.null( psytkSurveyData$warnings  )){
-        catn("There were warnings during the reading in the survey data.")
-        catn("Make sure to consider this in your data analysis.")
-        catn("Call psytkWarnings() to see the details.")
+        add("There were warnings during the reading in the survey data.")
+        add("Make sure to consider this in your data analysis.")
+        add("Call psytkWarnings() to see the details.")
     }
 
-    catn("Sample size: " , psytkSurveyData$n ,"\n")
+    add("Sample size: " , psytkSurveyData$n ,"\n")
 
     ## -- Report times used + min,max ----------------------------------------
 
@@ -49,49 +54,49 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
 
     allTimes = data.frame( label=colnames(psytkSurveyData$times) , medTimes,minTimes,maxTimes)
 
-    catn("Answering speed in MM:SS or HH:MM:SS")
-    catn("Questions combined on one screen are for the screen")
+    add("Answering speed in MM:SS or HH:MM:SS")
+    add("Questions combined on one screen are for the screen")
 
-    psytkTable( allTimes , header=c("Label","Median","Shortest","Longest" ) )
+    add( psytkTable( allTimes , header=c("Label","Median","Shortest","Longest" ) ) )
 
     ## -- Check if CloudResearch demographics is coded -----------------------
 
     if ( "CRData" %in% names( psytkSurveyData ) ){
-        catn("CloudResearch Demographic data are available:\n")
+        add("CloudResearch Demographic data are available:\n")
         tmpAge = as.numeric( psytkSurveyData$CRData$Age )
-        catn("Age Range : ",reportRange( tmpAge ))
-        catn("    Mean  : ",round( mean(tmpAge) ,digits=2))
-        catn("    Median: ",round( median(tmpAge) ,digits=2))
+        add("Age Range : ",reportRange( tmpAge ))
+        add("    Mean  : ",round( mean(tmpAge) ,digits=2))
+        add("    Median: ",round( median(tmpAge) ,digits=2))
         
-        catn("Men       : ",sum( psytkSurveyData$CRData$Sex=="Male" )  , " ", round( sum( psytkSurveyData$CRData$Sex=="Male" ) / psytkSurveyData$n * 100 , digits = 0 ) , "%" )
-        catn("Women     : ",sum( psytkSurveyData$CRData$Sex=="Female") , " ", round( sum( psytkSurveyData$CRData$Sex=="Female" ) / psytkSurveyData$n * 100 , digits = 0), "%" )
-        catn("---------------------------------------------------")
+        add("Men       : ",sum( psytkSurveyData$CRData$Sex=="Male" )  , " ", round( sum( psytkSurveyData$CRData$Sex=="Male" ) / psytkSurveyData$n * 100 , digits = 0 ) , "%" )
+        add("Women     : ",sum( psytkSurveyData$CRData$Sex=="Female") , " ", round( sum( psytkSurveyData$CRData$Sex=="Female" ) / psytkSurveyData$n * 100 , digits = 0), "%" )
+        add("---------------------------------------------------")
 
-        catn("counts/percentages race:\n")
+        add("counts/percentages race:\n")
         tmpCounts      = table( psytkSurveyData$CRData$Race )
         tmpPercentages = proportions( tmpCounts ) * 100
-        print(cbind(tmpCounts,tmpPercentages))
-        catn("------------------------------------------------\n\n")
+        add(cbind(tmpCounts,tmpPercentages))
+        add("------------------------------------------------\n\n")
     }
 
     ## -- Check if Prolific demographics is coded -----------------------
 
     if ( "PRData" %in% names( psytkSurveyData ) ){
-        catn("\nProlific Demographic data are available:\n")
+        add("\nProlific Demographic data are available:\n")
         tmpAge = as.numeric( psytkSurveyData$PRData$Age )
-        catn("Age Range : ",reportRange( tmpAge ))
-        catn("Age Mean  : ",round( mean(tmpAge) ,digits=2))
-        catn("Age Median: ",round( median(tmpAge) ,digits=2))
-        catn("")
-        catn("Men       : ",sum( psytkSurveyData$PRData$Sex=="Male" )  , " ", round( sum( psytkSurveyData$PRData$Sex=="Male" ) / psytkSurveyData$n * 100 , digits = 0 ) , "%" )
-        catn("Women     : ",sum( psytkSurveyData$PRData$Sex=="Female") , " ", round( sum( psytkSurveyData$PRData$Sex=="Female" ) / psytkSurveyData$n * 100 , digits = 0), "%" )
+        add("Age Range : ",reportRange( tmpAge ))
+        add("Age Mean  : ",round( mean(tmpAge) ,digits=2))
+        add("Age Median: ",round( median(tmpAge) ,digits=2))
+        add("")
+        add("Men       : ",sum( psytkSurveyData$PRData$Sex=="Male" )  , " ", round( sum( psytkSurveyData$PRData$Sex=="Male" ) / psytkSurveyData$n * 100 , digits = 0 ) , "%" )
+        add("Women     : ",sum( psytkSurveyData$PRData$Sex=="Female") , " ", round( sum( psytkSurveyData$PRData$Sex=="Female" ) / psytkSurveyData$n * 100 , digits = 0), "%" )
 
-        catn("counts/percentages race:\n")
+        add("counts/percentages race:\n")
         tmpCounts      = table( psytkSurveyData$PRData$Ethnicity.simplified )
         tmpPercentages = proportions( tmpCounts ) * 100
         tmp = as.data.frame(cbind(tmpCounts,tmpPercentages))
 
-        catn("------------------------------------------------\n\n")
+        add("------------------------------------------------\n\n")
     }
 
     ##--------------------------------------------------------------
@@ -101,7 +106,7 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
 
         ## -- main title 
 
-        # catn(paste("Label: ", psytkSurvey[ i ,"labels"] , " (" , psytkSurvey[ i ,"types"] , ") " , psytkSurvey[i,"notes"] ,sep="") ) ; hr()
+        # add(paste("Label: ", psytkSurvey[ i ,"labels"] , " (" , psytkSurvey[ i ,"types"] , ") " , psytkSurvey[i,"notes"] ,sep="") ) ; hr()
         tmpType = psytkSurvey[ i ,"types"] 
         if ( tmpType == "radio" ){tmpType="multiple choice"}
 
@@ -110,12 +115,12 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
         tmpType = psytkSurvey[ i , "types" ] # extract type of question        
         content = data.frame( tmpLabel , format( tmpType , width = 15 - length(tmpType) , justify="centre" ))
 
-        psytkTable( content , header = F )
+        add( psytkTable( content , header = FALSE ) )
 
-        if ( question == T ){
+        if ( question == TRUE ){
             tmpQuestion = psytkSurvey$questions[i]
             if ( tmpQuestion != "" ){
-                catn("Question: ", tmpQuestion )
+                add("Question: ", tmpQuestion )
             }
         }
 
@@ -135,12 +140,12 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
             colPercentage = rep("",length(tmpItems) )
             
             for( j in 1:length(tmpItems)){
-                colNanswers[j] = sum( tmpScores == j , na.rm=T)
+                colNanswers[j] = sum( tmpScores == j , na.rm=TRUE)
                 colPercentage[j]  = round0p( sum( tmpScores == j , na.rm=TRUE) , tmpN )
             }
 
-            psytkTable( data.frame( tmpItems , colNanswers , colPercentage ) , header=c("Items","N","%"))
-            catn()
+            add( psytkTable( data.frame( tmpItems , colNanswers , colPercentage ) , header=c("Items","N","%")) )
+            add()
         }
 
         ## ##### -- drop (essentially the same as radio) -------------------------------
@@ -152,9 +157,9 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
             tmpScores = psytkSurveyData$dropScores[,tmpLabel]
             tmpN       = length(tmpScores)
             for( j in 1:length(tmpItems)){
-                catn( "- ",tmpItems[j],"\t| n =",sum( tmpScores == j , na.rm=T) , "\t|" , round0p( sum( tmpScores == j , na.rm=TRUE) , tmpN ))
+                add( "- ",tmpItems[j],"\t| n =",sum( tmpScores == j , na.rm=TRUE) , "\t|" , round0p( sum( tmpScores == j , na.rm=TRUE) , tmpN ))
             }
-            catn()
+            add()
         }
 
         ## ##### -- check --------------------------------------------------------------
@@ -169,8 +174,8 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
                 tmpN = sum( !is.na( psytkSurveyData$checkAnswers[,paste(tmpLabel,j,sep=".")] ) )
                 tmpPercentages[j] = round0p( sum( psytkSurveyData$checkAnswers[,paste(tmpLabel, j ,sep=".") ] , na.rm=TRUE) , tmpN )
             }
-            catn()
-            psytkTable( data.frame( percentage=tmpPercentages , items=tmpItems ) )
+            add()
+            add( psytkTable( data.frame( percentage=tmpPercentages , items=tmpItems ) ) )
         }
 
         ## ##### -- textline --------------------------------------------------------------
@@ -188,24 +193,24 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
                     if ( sum( !is.na( psytkSurveyData$textlineAnswers[,tmpLabel] ) ) > 0 ){
                         tmpcount  = sum( !is.na( psytkSurveyData$textlineAnswers[,tmpLabel] ) )
                         tmpperc   = paste( round( tmpcount / psytkSurveyData$n * 100 , digits = 1 ) , "%" , sep="" )
-                        tmpmean   = mean(as.numeric(psytkSurveyData$textlineAnswers[,tmpLabel]),na.rm=T)
-                        tmpmedian = median(as.numeric(psytkSurveyData$textlineAnswers[,tmpLabel]),na.rm=T)
+                        tmpmean   = mean(as.numeric(psytkSurveyData$textlineAnswers[,tmpLabel]),na.rm=TRUE)
+                        tmpmedian = median(as.numeric(psytkSurveyData$textlineAnswers[,tmpLabel]),na.rm=TRUE)
                         
-                        catn("Range : ",reportRange( as.numeric(psytkSurveyData$textlineAnswers[,tmpLabel] ) ))
-                        catn("Mean  : ",round( tmpmean ,digits=2))
-                        catn("Median: ",round( tmpmedian ,digits=2))
-                        catn("N     : ",tmpcount,tmpperc,"answered")
+                        add("Range : ",reportRange( as.numeric(psytkSurveyData$textlineAnswers[,tmpLabel] ) ))
+                        add("Mean  : ",round( tmpmean ,digits=2))
+                        add("Median: ",round( tmpmedian ,digits=2))
+                        add("N     : ",tmpcount,tmpperc,"answered")
                     }else{
-                        catn("Nobody answered")
+                        add("Nobody answered")
                     }
                     
                 }else{ ## if textline contains strongs
-                    catn("Unique Answers given:")
+                    add("Unique Answers given:")
 
                     tmpAnswers = unique(dropNA( psytkSurveyData$textlineAnswers[,tmpLabel] ) )
                     tmpAnwers = tmpAnswers[ tmpAnswers != "" ]
 
-                    for( tmpx in 1:length(tmpAnswers) ){ catn(tmpAnswers[tmpx] ) }
+                    for( tmpx in 1:length(tmpAnswers) ){ add(tmpAnswers[tmpx] ) }
                 }
 
             }else{
@@ -218,24 +223,24 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
                         if ( sum( !is.na( psytkSurveyData$textlineAnswers[,tmpSubLabel] ) ) > 0 ){
                             tmpcount  = sum( !is.na( psytkSurveyData$textlineAnswers[,tmpSubLabel] ) )
                             tmpperc   = paste( round( tmpcount / psytkSurveyData$n * 100 , digits = 1 ) , "%" , sep="" )
-                            tmpmean   = mean(as.numeric(psytkSurveyData$textlineAnswers[,tmpSubLabel]),na.rm=T)
-                            tmpmedian = median(as.numeric(psytkSurveyData$textlineAnswers[,tmpSubLabel]),na.rm=T)
+                            tmpmean   = mean(as.numeric(psytkSurveyData$textlineAnswers[,tmpSubLabel]),na.rm=TRUE)
+                            tmpmedian = median(as.numeric(psytkSurveyData$textlineAnswers[,tmpSubLabel]),na.rm=TRUE)
                             
-                            catn("Range : ",reportRange( as.numeric(psytkSurveyData$textlineAnswers[,tmpSubLabel] ) ))
-                            catn("Mean  : ",round( tmpmean ,digits=2))
-                            catn("Median: ",round( tmpmedian ,digits=2))
-                            catn("N     : ",tmpcount,tmpperc,"answered")
+                            add("Range : ",reportRange( as.numeric(psytkSurveyData$textlineAnswers[,tmpSubLabel] ) ))
+                            add("Mean  : ",round( tmpmean ,digits=2))
+                            add("Median: ",round( tmpmedian ,digits=2))
+                            add("N     : ",tmpcount,tmpperc,"answered")
                         }else{
-                            catn("Nobody answered")
+                            add("Nobody answered")
                         }
                     }else{ ## if textlines contain strings
 
-                        catn("Answers given:")
-                        catn( paste( psytkSurveyData$textlineAnswers[,tmpSubLabel] ) )
+                        add("Answers given:")
+                        add( paste( psytkSurveyData$textlineAnswers[,tmpSubLabel] ) )
                     }
                 }
             }
-            catn()
+            add()
         }
 
         ## ##### -- textbox --------------------------------------------------------------
@@ -247,11 +252,11 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
             if ( length(tmpItems) > 1 ){
                 for( j in 1:length(tmpItems) ){
                     for( k in 1:psytkSurveyData$n ){
-                        catn( "| " , psytkSurveyData$textboxAnswers[ j , paste( tmpLabel , k , sep = "." ) ] )
+                        add( "| " , psytkSurveyData$textboxAnswers[ j , paste( tmpLabel , k , sep = "." ) ] )
                     }
                 }
             }
-            catn()
+            add()
         }
 
         ## ##### -- rank --------------------------------------------------------------
@@ -266,9 +271,9 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
                 tmpN = sum( !is.na( psytkSurveyData$rankAnswers[,paste(tmpLabel, j ,sep=".")] ) )
                 tmpPercentages[j] = sprintf("%.2f",round(mean( psytkSurveyData$rankAnswers[,paste(tmpLabel, j ,sep=".")] ),digits=2))
             }
-            catn()
+            add()
 
-            psytkTable( data.frame( position=tmpPercentages , items=tmpItems ) )
+            add( psytkTable( data.frame( position=tmpPercentages , items=tmpItems ) ) )
         }
 
         ## ##### -- range --------------------------------------------------------------
@@ -283,9 +288,9 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
                 tmpN = sum( !is.na( psytkSurveyData$rangeAnswers[,paste(tmpLabel,j,sep=".")] ) )
                 tmpScores[j] = sprintf("%.2f",round( mean( psytkSurveyData$rangeAnswers[,paste(tmpLabel,j,sep=".")] ) , digits = 2 ))
             }
-            catn()
+            add()
 
-            psytkTable( data.frame( mean=tmpScores , items=tmpItems ) )
+            add( psytkTable( data.frame( mean=tmpScores , items=tmpItems ) ) )
         }
 
         ## ##### -- set --------------------------------------------------------------
@@ -293,12 +298,12 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
         if ( tmpType == "set" ){
             
             tmpLabel   = psytkSurvey[i,"labels"]
-            tmpScores = psytkSurveyData$setScores[,tmpLabel]
+            tmpScores = psytkSurveyData$setAnswers[,tmpLabel]
             tmpN       = sum(!is.na(tmpScores))
-            catn( "n =",tmpN , "\t| mean = " , round( mean( tmpScores ) ,digits=2) , 
+            add( "n =",tmpN , "\t| mean = " , round( mean( tmpScores ) ,digits=2) , 
                  "\t| median = " , median( tmpScores ) , 
                  "\t| range = " , reportRange( tmpScores ) )
-            catn()
+            add()
 
         }
 
@@ -311,8 +316,8 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
             df = NULL # start with data frame
 
             if ( length( tmpItems ) == 1 ){ # for these, we do not use the dots in the scaleScores
-                tmpScore = sprintf("%.2f",round( mean( psytkSurveyData$scaleScores[,tmpLabel ] , na.rm=T ) , digits = 2 ))
-                catn(tmpScore,"\t|",tmpItems[1] )
+                tmpScore = sprintf("%.2f",round( mean( psytkSurveyData$scaleScores[,tmpLabel ] , na.rm=TRUE ) , digits = 2 ))
+                add(tmpScore,"\t|",tmpItems[1] )
                 df = rbind( df , c(tmpScore,tmpItems[1] ))
             }else{ # if there is more than one item (which is the typical use)
                 for( j in 1:length(tmpItems) ){
@@ -323,28 +328,45 @@ psytkReport = function( psytkSurveyData , textbox=FALSE , question = TRUE ){
 
             colnames(df)=c("Mean score","Item")
 
-            psytkTable(df)
+            add( psytkTable(df) )
 
-            catn()
+            add()
         }
     } # end of for loop through all survey questionnaire items
+
+    out = paste(lines, collapse = "\n")
+    out = structure(out, class = "psytkReport") # this is R style so you can use print(psytkReport(d))
+    
+    if (isTRUE(print)) {
+        print(out)
+        return(invisible(out))
+    } else {
+        return(out)
+    }
+
 }
 
 ## this simply gives you a list of all labels and questions
 
 psytkQ = function( data ){ data$surveyobject$overview }
 
-psytkWarnings = function( data ){
+psytkWarnings = function( data , verbose = TRUE ){
 
     if( length(data$warnings) > 0 ){
 
-        catn("Number of warnings: ",length(data$warnings))
-
-        for( i in 1:length(data$warnings) ){
-            catn( i , ": ", data$warnings[i] )
+        if( verbose ){
+            message("Number of warnings: ",length(data$warnings))
+            for( i in 1:length(data$warnings) ){
+                message( i , ": ", data$warnings[i] )
+            }
         }
     }else{
-        catn("There were no warnings.")
+        message("There were no warnings.")
     }
 
+}
+
+print.psytkReport <- function(x, ...) {
+  cat(as.character(x), sep = "\n")
+  invisible(x)
 }

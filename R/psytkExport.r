@@ -1,9 +1,9 @@
 ## this function creates a spreadsheet of all data for convenience and exports as xlsx2 format
 ## exports to XLSX using openxlsx2
-## if you choose labels=T, then you get the labels instead of numbers for radio/check
-## if you choose orderByType=T, then you get them in order of type rather than order in the questionnaire.
+## if you choose labels=TRUE, then you get the labels instead of numbers for radio/check
+## if you choose orderByType=TRUE, then you get them in order of type rather than order in the questionnaire.
 
-psytkExport = function( surveydata , file = "exported_data.xlsx" , labels = F , orderByType = F){
+psytkExport = function( surveydata , file = "exported_data.xlsx" , labels = FALSE , orderByType = FALSE){
 
     ## we create a workbook with different sheets
     ## sheet one called "survey"
@@ -94,8 +94,8 @@ psytkExport = function( surveydata , file = "exported_data.xlsx" , labels = F , 
         }
         
         if ( qtype == "set"      ){
-            containerA[[ label ]] = surveydata$setAnswers[ , label ]
-            containerS[[ label ]] = surveydata$setScores[ , label ]
+            containerA[[ label ]] = surveydata$setAnswers[ , label ] # there are only set answers, even though in spreadsheat, we work with idea of "scores"
+            containerS[[ label ]] = surveydata$setAnswers[ , label ]
         }
         
         if ( qtype == "scale"    ){
@@ -105,18 +105,20 @@ psytkExport = function( surveydata , file = "exported_data.xlsx" , labels = F , 
 
         if ( qtype == "textbox" ){ ## todo: need to replace ~ with newline if not yet done?
             containerA[[ label ]] = surveydata$textboxAnswers[ , label ]
-            containerA[[ label ]] = gsub( "~~","\n", containerA[[ label ]] , fixed=T )
+            containerA[[ label ]] = gsub( "~~","\n", containerA[[ label ]] , fixed=TRUE )
 
             containerS[[ label ]] = surveydata$textboxAnswers[ , label ]
-            containerS[[ label ]] = gsub( "~~","\n", containerA[[ label ]] , fixed=T )
+            containerS[[ label ]] = gsub( "~~","\n", containerA[[ label ]] , fixed=TRUE )
         }
     }
 
     outA = data.frame( containerA )
     outS = data.frame( containerS )
 
-    ## find the colums that need writing, i.e, have "textbox"
-    colsWithTextBox = which (  c( F , F , tmp[match( colnames(outA[3:ncol(outA)]) , tmp[,1] ),2]=="textbox" ))
+    ## find the colums in outA that need wrapping because they represent a textbox question
+    ## note that tmp is a dataframe. The first two columns will be reserved for ID information (hence FALSE).
+    ## the rest is simply based on outA, which contains all the types
+    colsWithTextBox = which (  c( FALSE , FALSE , tmp[match( colnames(outA[3:ncol(outA)]) , tmp[,1] ),2]=="textbox" ))
 
     ## ############################################################################
     ## Now create workbook and sheets for output.
@@ -144,8 +146,8 @@ psytkExport = function( surveydata , file = "exported_data.xlsx" , labels = F , 
     workbook$set_col_widths(sheet="Scores",cols=1:ncol(outS),widths="auto")
 
     ## align top vertically by default
-    workbook$add_cell_style( sheet="Raw answers",dims=wb_dims(cols=1:ncol(outA),rows=1:nrow(outA) ),apply_alignment=T,vertical="top")
-    workbook$add_cell_style( sheet="Scores",dims=wb_dims(cols=1:ncol(outS),rows=1:nrow(outS) ),apply_alignment=T,vertical="top")
+    workbook$add_cell_style( sheet="Raw answers",dims=wb_dims(cols=1:ncol(outA),rows=1:nrow(outA) ),apply_alignment=TRUE,vertical="top")
+    workbook$add_cell_style( sheet="Scores",dims=wb_dims(cols=1:ncol(outS),rows=1:nrow(outS) ),apply_alignment=TRUE,vertical="top")
 
     ## now text-wapping and less space for the textbox columns
     targetDims = wb_dims( cols=colsWithTextBox,rows=2:(nrow(outA)+1) )
@@ -153,8 +155,8 @@ psytkExport = function( surveydata , file = "exported_data.xlsx" , labels = F , 
     if ( length( colsWithTextBox ) > 0 ){
         workbook$set_col_widths( sheet="Raw answers",cols=colsWithTextBox,widths=50 ) # 50 is in their units
         workbook$set_col_widths( sheet="Scores",cols=colsWithTextBox,widths=50 ) # 50 is in their units
-        workbook$add_cell_style( sheet="Raw answers",dims=targetDims,wrap_text=T)
-        workbook$add_cell_style( sheet="Scores",dims=targetDims,wrap_text=T)
+        workbook$add_cell_style( sheet="Raw answers",dims=targetDims,wrap_text=TRUE)
+        workbook$add_cell_style( sheet="Scores",dims=targetDims,wrap_text=TRUE)
     }
 
     ## sheet 2: times 

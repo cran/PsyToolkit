@@ -41,7 +41,7 @@ psytkParseSurvey = function( datadir = NA , surveyfilename = NA ){
     while( tmp[1] == "" ) { tmp=tmp[2:length(tmp)] } ## remove empty lines from top of file
 
     ## remove double empty lines between questions
-    repeatedEmptyLine = c( F , tmp[2:length(tmp)]==tmp[1:(length(tmp)-1)] ) & tmp==""
+    repeatedEmptyLine = c( FALSE , tmp[2:length(tmp)]==tmp[1:(length(tmp)-1)] ) & tmp==""
     tmp = tmp[ !repeatedEmptyLine ]
 
     ## add one extra empty line to make parsing easier
@@ -64,8 +64,8 @@ psytkParseSurvey = function( datadir = NA , surveyfilename = NA ){
     psytkItems       = NULL ## a vector of lists
     psytkAnswers     = list()
     currentLabel     = currentType = ""
-    inQuestion       = F ## this means we are in a question starting with l: and ending with empty line
-    inQuestionText   = F ## this means we are processing the q: line
+    inQuestion       = FALSE ## this means we are in a question starting with l: and ending with empty line
+    inQuestionText   = FALSE ## this means we are processing the q: line
     
     while( line < length( tmp )){
         line = line + 1 ## this helps to iterate through all questions
@@ -77,7 +77,7 @@ psytkParseSurvey = function( datadir = NA , surveyfilename = NA ){
             words = strsplit( current , " ")[[1]]
 
             if ( words[1] == "l:" ){
-                inQuestion = T ## needed, because with scale: you can also have scales with items etc
+                inQuestion = TRUE ## needed, because with scale: you can also have scales with items etc
 
                 ## init stuff
                 currentLabel = words[2]
@@ -100,7 +100,7 @@ psytkParseSurvey = function( datadir = NA , surveyfilename = NA ){
                 
                 if ( words[1] == "-" ){ ## this means the items are starting
                     inQuestionText = F
-                    if ( inQuestion == T ){
+                    if ( inQuestion == TRUE ){
                         currentItems = c( currentItems , substr( current , 3 , nchar( current ) ))
                     }
                 }
@@ -112,7 +112,7 @@ psytkParseSurvey = function( datadir = NA , surveyfilename = NA ){
                     }
                 }
 
-                if ( words[1] != "l:" & words[1] != "t:" & words[1] != "o:" & words[1] != "-" & words[1] != "q:" & inQuestion == T ){
+                if ( words[1] != "l:" & words[1] != "t:" & words[1] != "o:" & words[1] != "-" & words[1] != "q:" & inQuestion == TRUE ){
                     currentQuestion = paste( currentQuestion , current , sep="\n" )
                 }
             }
@@ -120,7 +120,7 @@ psytkParseSurvey = function( datadir = NA , surveyfilename = NA ){
             inQuestionText = F
             ## we found the end of a question, so new question is coming
             ## now we can complete past question data
-            if ( inQuestion == T ){
+            if ( inQuestion == TRUE ){
 
                 psytkQuestions = c( psytkQuestions , currentQuestion )
 

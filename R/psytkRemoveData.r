@@ -18,8 +18,6 @@ psytkRemoveData = function( psytkSurveyData , selection ){
     radioScores       =  psytkSurveyData$radioScores[!selection,]       
 
     setAnswers        =  psytkSurveyData$setAnswers[!selection,]   
-    setScores         =  psytkSurveyData$setScores[!selection,]       
-
     
     dropAnswers       =  psytkSurveyData$dropAnswers[!selection,]   
     dropScores        =  psytkSurveyData$dropScores[!selection,]   

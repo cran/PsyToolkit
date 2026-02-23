@@ -5,7 +5,8 @@
 Exports most of the loaded PsyToolkit data to Excel file.
 }
 \usage{
-psytkExport(surveydata , file = "exported_data.xlsx" , labels = F , orderByType = F)
+psytkExport(surveydata , file = "exported_data.xlsx" , labels = FALSE ,
+orderByType = FALSE )
 }
 \arguments{
   \item{surveydata}{The PsyToolkit survey data object}
@@ -19,14 +20,14 @@ No returned value.
 \examples{
 ## Real workflow (requires your own PsyToolkit data files in myfolder)
 \dontrun{
-d = psytkReadData( "myfolder" )
+psytkDemo = psytkReadData( "myfolder" )
 }
 ## runnable example for CRAN checks:
-data(d) # or for runnable example
+data( psytkDemo ) # or for runnable example
 
 tmp_out_file = tempfile(fileext=".xlsx")
 
-psytkExport( d , tmp_out_file )
+psytkExport( psytkDemo , tmp_out_file )
 
 unlink( tmp_out_file)
 }

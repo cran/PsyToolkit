@@ -2,7 +2,6 @@
 ##
 ## simple convenience functions:
 ## round0p(n,total)              rounds percentage with percentage sign just for convenience
-## catn( strings etc )           similar to cat but adds newline
 ## hr()
 ## isNumberString                does a string represent a number
 ## dropNA                        removes NA values from a vector (better than na.omit)
@@ -21,9 +20,6 @@
 ## round to a percentage based on an n and a total number (practical for error reporting)
 round0p = function(n,total){ return( paste(round( n/total*100 , digits=0 ),"%",sep="")) }
 
-## write out text ending in newline
-catn = function(...){cat(fill=T,...)}
-
 ## reportRange is for a human readable range report (e.g., "10 to 20")
 
 reportRange=function(data){ return( paste(min(data,na.rm=TRUE),"to",max(data,na.rm=TRUE)))}
@@ -36,7 +32,7 @@ psytkReadTable = function( filename ){
     ## ll reports for each line of the file how many items there are
     ll = as.numeric(sapply(lines, function(line) length(strsplit(line, "\\s+")[[1]]))) # split by one or more spaces
     if ( length(unique(ll))==1 ){
-        return( read.table( filename , header = F ))
+        return( read.table( filename , header = FALSE ))
     }else{
         return( read.table( filename, fill = TRUE, col.names = paste0("V", 1:max(ll)), header = FALSE) )
     }

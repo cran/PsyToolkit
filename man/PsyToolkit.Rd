@@ -47,7 +47,7 @@ Functions to read, summarise, and export PsyToolkit questionnaire and experiment
 
 \strong{Example}
 
-A small example object is included for documentation examples: \code{data(d)}.
+A small example object is included for documentation examples: \code{data(psytkDemo)}.
 This is not required for normal usage.
 }
 
