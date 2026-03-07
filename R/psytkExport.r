@@ -118,7 +118,12 @@ psytkExport = function( surveydata , file = "exported_data.xlsx" , labels = FALS
     ## find the colums in outA that need wrapping because they represent a textbox question
     ## note that tmp is a dataframe. The first two columns will be reserved for ID information (hence FALSE).
     ## the rest is simply based on outA, which contains all the types
-    colsWithTextBox = which (  c( FALSE , FALSE , tmp[match( colnames(outA[3:ncol(outA)]) , tmp[,1] ),2]=="textbox" ))
+
+    if ( any(tmp[,2]=="textbox") ){
+        colsWithTextBox = which (  c( FALSE , FALSE , tmp[match( colnames(outA[3:ncol(outA)]) , tmp[,1] ),2]=="textbox" ))
+    }else{
+        colsWithTextBox = NULL
+    }
 
     ## ############################################################################
     ## Now create workbook and sheets for output.

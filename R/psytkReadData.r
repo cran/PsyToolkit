@@ -1,3 +1,18 @@
+## internal function. Sometimes when combining Prolific data frames,
+## you have some columns in only one of the files this is like rbind,
+## but combines correctly if one data frame has different columns
+
+rbindAllCols = function( df1 , df2 ){
+
+    all_cols = union(names(df1), names(df2))
+    
+    df1[setdiff(all_cols, names(df1))] = NA
+    df2[setdiff(all_cols, names(df2))] = NA
+  
+    rbind(df1[all_cols], df2[all_cols])
+
+}
+
 psytkReadData = function( surveyOrDir , psytkAllowRepeatExp = TRUE , verbose = TRUE ){
 
     warnings = NULL # this is a vector of strings
@@ -685,7 +700,7 @@ psytkReadData = function( surveyOrDir , psytkAllowRepeatExp = TRUE , verbose = T
                 ## now check if there is a file with the assignments assignments_*.csv
                 expectedName = paste("assignments_",tmpId,".csv",sep="" )
                 if ( file.exists( file.path( psytkSurveyDir , expectedName ))){
-                    if(verbose(message("Now reading CloudResearch demographic data file: ",file.path( psytkSurveyDir , expectedName ))))
+                    if( verbose ){ message("Now reading CloudResearch demographic data file: ",file.path( psytkSurveyDir , expectedName ))}
                     if ( is.null ( tmpCRData ) ){
                         tmpCRData = read.csv(file.path( psytkSurveyDir , expectedName ))
                     }else{
@@ -733,16 +748,23 @@ psytkReadData = function( surveyOrDir , psytkAllowRepeatExp = TRUE , verbose = T
                 expectedName1 = paste("prolific_demographic_export_",tmpId,".csv",sep="" )
                 expectedName2 = paste("prolific_export_",tmpId,".csv",sep="" )
 
-                if ( file.exists( file.path( psytkSurveyDir , expectedName1 ))){ expectedName = expectedName1 }
-                if ( file.exists( file.path( psytkSurveyDir , expectedName2 ))){ expectedName = expectedName2 }
+                if ( file.exists( file.path( psytkSurveyDir , expectedName1 ))){
+                    expectedName = expectedName1
+                }else{
+                    if ( file.exists( file.path( psytkSurveyDir , expectedName2 ))){
+                        expectedName = expectedName2
+                    }else{
+                        expectedName = "not_found"
+                    }
+                }
 
                 if ( file.exists( file.path( psytkSurveyDir , expectedName ))){
-                    if(verbose(message("Now reading Prolific demographic data file: ",file.path( psytkSurveyDir , expectedName ))))
+                    if(verbose){message("Now reading Prolific demographic data file: ",file.path( psytkSurveyDir , expectedName ))}
                     if ( is.null ( tmpPRData ) ){
                         tmpPRData = read.csv(file.path( psytkSurveyDir , expectedName ))
                     }else{
                         tmpReadFile = read.csv(file.path( psytkSurveyDir , expectedName ))
-                        tmpPRData = rbind( tmpPRData , tmpReadFile )
+                        tmpPRData = rbindAllCols( tmpPRData , tmpReadFile )
                     }
                 }else{
                     if(verbose){

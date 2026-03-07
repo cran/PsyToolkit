@@ -1,9 +1,9 @@
-4412376c80a7cf38f764d6ea2349c883 *DESCRIPTION
+9fbd86f9c314ea3ecb6aa9cdaa7a3022 *DESCRIPTION
 a2651f162d21064c2ba911ef1516c627 *LICENSE
 17eff7178253ccc87619d6abec6f43ae *NAMESPACE
-6aa8f597f7e5c973aba9f65ec87ce6b2 *R/psytkExport.r
+c7ab38f6368cafb85f8bf6ec074b06bf *R/psytkExport.r
 7727f4efe1fea678a756a8fda2a75e33 *R/psytkParseSurvey.r
-2f6f1a68ca586c48df791e0963b5d211 *R/psytkReadData.r
+e88007c380563dbf74513e04ce0d1255 *R/psytkReadData.r
 7c26bf48b5ae0536d1b9c35157191948 *R/psytkRemoveData.r
 eff932f1b34a544839d3fd2b5531266e *R/psytkReport.r
 d42d54f991b9268f87e02a8b3ad8d3e0 *R/psytkTable.r
